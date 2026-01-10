@@ -1,55 +1,89 @@
-<h2 align="center">Nixvim</h2>
+<h1 id="header" align="center">
+    <img src="https://github.com/nix-community/nixvim/blob/main/assets/nixvim_logo.svg" width="25%" />
+   <br>
+ sysBOFH NixVim
+</h1>
 
-> This repository contains my Neovim configuration, which is declaratively written in Nix.
+#### This is my functional, minimalist, and carefully curated collection of essential plugins, paired with a clean and simple configuration for [NixVim](https://nix-community.github.io/nixvim/).
 
-**Configuring/editting**
+---
 
-To start configuring, just add or modify the Nix files in `./config`.
+![BOFH01](./assets/BOFH_01.png)
+![BOFH02](./assets/BOFH_02.png)
 
-If you add a new configuration file, remember to add it to the [`config/default.nix`](./config/default.nix) file
+### Installation
 
-**Testing your new configuration**
+#### Run it
+```nix
+nix run github:wverac/nixvim
+```
 
-To test your configuration simply run the following command
-
-```sh
+#### Clone
+```nix
+git clone https://github.com/wverac/nixvim
 nix run .
 ```
 
-To test the config without first cloning the repo simply run the following command
-
-```sh
-nix run github:Ahwxorg/nixvim-config
-```
-
-**Add to flake:**
-
-I have the following in flake.nix
+#### Flake
 
 ```nix
 {
-....
-inputs = {
-  nixvim.url = "github:ahwxorg/nixvim-config";
+    inputs = {
+        nixvim.url = "github:wverac/nixvim"
+    };
 }
-....
-};
 ```
 
-And then I have a `packages.nix` file that contains:
+#### System-Wide
 
 ```nix
-{ inputs, pkgs, ... }: 
-{
-  home.packages = with pkgs; [
-    ...
-    inputs.nixvim.packages.${pkgs.system}.default
-  ];
-}
+environment.systemPackages = [
+    inputs.nixvim.packages.x86_64-linux.default
+];
 ```
 
-Or you can always [take a look yourself](https://github.com/Ahwxorg/nixos-config)
+#### Home-Manager
 
-## Credits
+```nix
+home-manager.users.<user>.home.packages = [
+    inputs.nixvim.packages.x86_64-linux.default
+];
+```
+#### My favorite method in non-NixOS systems
+Requires [Nix package manager](https://nixos.org/download/#download-nix
+)
 
-Huge amount of credits to [elythh](https://github.com/elythh/nixvim)! I've ~~taken~~ shamelessly stolen quite a lot of their configuration.
+```nix
+alias vim='nix run github:wverac/nixvim'
+```
+
+### Structure
+
+```bash
+nixvim
+├── config
+│   ├── default.nix
+│   ├── keymaps.nix
+│   ├── options.nix
+│   ├── plugs
+│   │   ├── alpha.nix
+│   │   ├── cmp.nix
+│   │   ├── lsp.nix
+│   │   ├── lspsaga.nix
+│   │   └── ui.nix
+│   └── themes
+│       ├── catppuccin.nix
+│       └── tokyonight.nix
+├── flake.lock
+├── flake.nix
+├── hydra.json
+└── README.md
+```
+
+### My NixOS configuration
+
+https://github.com/wverac/sysbofh
+
+### TODO
+
+* Write a decent and useful TODO

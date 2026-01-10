@@ -1,39 +1,67 @@
 {
-  # Import all your configuration modules here
-  imports = [
-    # ./plugins.nix
-    ./modules/plugins/autopairs.nix
-    ./modules/plugins/blink.nix
-    ./modules/plugins/bufferline.nix
-    ./modules/plugins/cmp.nix
-    ./modules/plugins/colorscheme.nix
-    ./modules/plugins/comment.nix
-    ./modules/plugins/comment-box.nix
-    ./modules/plugins/conform.nix
-    ./modules/plugins/diagram.nix
-    ./modules/plugins/gitsigns.nix
-    ./modules/plugins/himalaya.nix
-    ./modules/plugins/icons.nix
-    ./modules/plugins/image.nix
-    ./modules/plugins/lint.nix
-    ./modules/plugins/lsp.nix
-    ./modules/plugins/lualine.nix
-    ./modules/plugins/lz-n.nix
-    ./modules/plugins/markdown-preview.nix
-    ./modules/plugins/markview.nix
-    ./modules/plugins/neoscroll.nix
-    ./modules/plugins/neotree.nix
-    ./modules/plugins/noice.nix
-    ./modules/plugins/none-ls.nix
-    ./modules/plugins/oil.nix
-    ./modules/plugins/schemastore.nix
-    ./modules/plugins/telescope.nix
-    ./modules/plugins/treesitter.nix
-    ./modules/plugins/trouble.nix
-    ./modules/plugins/trunk.nix
+  pkgs,
+  system,
+  ...
+}: let
+  # Helper to determine if we're on Darwin
+  isDarwin = pkgs.stdenv.isDarwin;
+  isLinux = pkgs.stdenv.isLinux;
 
-    ./modules/plugins/others.nix
-    ./options.nix
-    ./keymappings.nix
+  # Common packages for all systems
+  commonPackages = with pkgs; [
+    # Required by telescope live grep
+    ripgrep
+    # Required by CMP and formatters
+    alejandra
+    nixpkgs-fmt
+    prettierd
+    nixfmt-classic
+    stylua
+    python312Packages.flake8
+    vimPlugins.vim-prettier
+    python312Packages.autopep8
+    yapf
+    black
+    isort
+    hadolint
+    #rubyfmt
+    shfmt
   ];
+
+  # Linux-specific packages
+  linuxPackages = with pkgs; [
+    wl-clipboard # Wayland clipboard
+    xdg-utils
+  ];
+
+  # Darwin-specific packages
+  darwinPackages = with pkgs; [
+    # macOS uses pbcopy/pbpaste for clipboard, which is built-in
+  ];
+in {
+  imports = [
+    ./themes/catppuccin.nix
+    ./plugs/lsp.nix
+    ./plugs/ui.nix
+    ./plugs/cmp.nix
+    ./options.nix
+    ./keymaps.nix
+    ./plugs/alpha.nix
+    ./plugs/lspsaga.nix
+    ./plugs/lualine.nix
+  ];
+  # globals.mapleader = " "; # defined in keymaps module
+
+  extraPackages =
+    commonPackages
+    ++ (
+      if isLinux
+      then linuxPackages
+      else []
+    )
+    ++ (
+      if isDarwin
+      then darwinPackages
+      else []
+    );
 }
